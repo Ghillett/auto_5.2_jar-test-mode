@@ -1,3 +1,5 @@
+package ru.netology.auto.util;
+
 import com.google.gson.Gson;
 
 import static io.restassured.RestAssured.given;

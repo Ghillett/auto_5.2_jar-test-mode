@@ -1,3 +1,5 @@
+package ru.netology.auto.util;
+
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
@@ -7,7 +9,7 @@ import static io.restassured.RestAssured.given;
 
 public class CreateUser {
 
-    CreateUser(String login, String password, String status) {
+    public CreateUser(String login, String password, String status) {
 
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .setBaseUri("http://localhost:9999")

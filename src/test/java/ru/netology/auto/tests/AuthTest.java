@@ -1,3 +1,5 @@
+package ru.netology.auto.tests;
+
 import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -5,6 +7,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static com.codeborne.selenide.Selenide.$x;
 import static com.codeborne.selenide.Selenide.open;
+
+import ru.netology.auto.util.*;
 
 class AuthTest {
 
