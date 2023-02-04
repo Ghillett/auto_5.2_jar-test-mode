@@ -2,11 +2,15 @@ package ru.netology.auto.tests;
 
 import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Selenide.$x;
 import static com.codeborne.selenide.Selenide.open;
+import static ru.netology.auto.util.DataGenerator.Registration.getRegisteredUser;
+import static ru.netology.auto.util.DataGenerator.Registration.getUser;
+import static ru.netology.auto.util.DataGenerator.getRandomLogin;
+import static ru.netology.auto.util.DataGenerator.getRandomPassword;
 
 import ru.netology.auto.util.*;
 
@@ -17,61 +21,63 @@ class AuthTest {
         open("http://localhost:9999");
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "vasya, password, active," +
-                    "vasya, password"
-    })
-    public void shouldTestExistingUser(String login, String password, String status, String actualLogin, String actualPassword) {
+    @Test
+    @DisplayName("Should successfully login with active registered user")
+    public void shouldTestRegisteredUser() {
 
-        CreateUser newUser = new CreateUser(login, password, status);
-        $x("//*[@data-test-id='login']//input").setValue(actualLogin);
-        $x("//*[@data-test-id='password']//input").setValue(actualPassword);
+        var registeredUser = getRegisteredUser("active");
+        $x("//*[@data-test-id='login']//input").setValue(registeredUser.getLogin());
+        $x("//*[@data-test-id='password']//input").setValue(registeredUser.getPassword());
         $x("//*[@data-test-id='action-login']").click();
 
         $x("//*[contains(text(), 'Личный кабинет')]").shouldBe(Condition.visible);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "vasya, password, active," +
-                    "petya, password"
-    })
-    public void shouldTestWrongLogin(String login, String password, String status, String actualLogin, String actualPassword) {
+    @Test
+    @DisplayName("Should get error message if login with not registered user")
+    public void shouldTestUnregisteredUser() {
 
-        CreateUser newUser = new CreateUser(login, password, status);
-        $x("//*[@data-test-id='login']//input").setValue(actualLogin);
-        $x("//*[@data-test-id='password']//input").setValue(actualPassword);
+        var unregisteredUser = getUser("active");
+        $x("//*[@data-test-id='login']//input").setValue(unregisteredUser.getLogin());
+        $x("//*[@data-test-id='password']//input").setValue(unregisteredUser.getPassword());
         $x("//*[@data-test-id='action-login']").click();
 
         $x("//*[@data-test-id='error-notification']//div[text() = 'Неверно указан логин или пароль']").shouldBe(Condition.visible);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "vasya, password, active," +
-                    "vasya, wrongpassword"
-    })
-    public void shouldTestWrongPassword(String login, String password, String status, String actualLogin, String actualPassword) {
+    @Test
+    @DisplayName("Should get error message if login with wrong login")
+    public void shouldTestWrongLogin() {
 
-        CreateUser newUser = new CreateUser(login, password, status);
-        $x("//*[@data-test-id='login']//input").setValue(actualLogin);
-        $x("//*[@data-test-id='password']//input").setValue(actualPassword);
+        var registeredUser = getRegisteredUser("active");
+        var wrongLogin =getRandomLogin();
+        $x("//*[@data-test-id='login']//input").setValue(wrongLogin);
+        $x("//*[@data-test-id='password']//input").setValue(registeredUser.getPassword());
         $x("//*[@data-test-id='action-login']").click();
 
         $x("//*[@data-test-id='error-notification']//div[text() = 'Неверно указан логин или пароль']").shouldBe(Condition.visible);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "vasya, password, blocked," +
-                    "vasya, password"
-    })
-    public void shouldTestBlockedStatus(String login, String password, String status, String actualLogin, String actualPassword) {
+    @Test
+    @DisplayName("Should get error message if login with wrong password")
+    public void shouldTestWrongPassword() {
 
-        CreateUser newUser = new CreateUser(login, password, status);
-        $x("//*[@data-test-id='login']//input").setValue(actualLogin);
-        $x("//*[@data-test-id='password']//input").setValue(actualPassword);
+        var registeredUser = getRegisteredUser("active");
+        var wrongPassword =getRandomPassword();
+        $x("//*[@data-test-id='login']//input").setValue(registeredUser.getLogin());
+        $x("//*[@data-test-id='password']//input").setValue(wrongPassword);
+        $x("//*[@data-test-id='action-login']").click();
+
+        $x("//*[@data-test-id='error-notification']//div[text() = 'Неверно указан логин или пароль']").shouldBe(Condition.visible);
+    }
+
+    @Test
+    @DisplayName("Should get error message if login with blocked registered user")
+    public void shouldTestBlockedStatus() {
+
+        var registeredUser = getRegisteredUser("blocked");
+        $x("//*[@data-test-id='login']//input").setValue(registeredUser.getLogin());
+        $x("//*[@data-test-id='password']//input").setValue(registeredUser.getPassword());
         $x("//*[@data-test-id='action-login']").click();
 
         $x("//*[@data-test-id='error-notification']//div[text() = 'Пользователь заблокирован']").shouldBe(Condition.visible);
